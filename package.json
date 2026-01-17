@@ -4,17 +4,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm run build && pnpm run preview",
-    "dev:remote": "pnpm --filter cashapps-remote dev",
-    "dev:host": "pnpm --filter crm-host dev",
-    "build": "pnpm --filter cashapps-remote build && pnpm --filter crm-host build",
-    "build:remote": "pnpm --filter cashapps-remote build",
-    "build:host": "pnpm --filter crm-host build",
-    "preview": "pnpm -r --parallel preview",
-    "preview:remote": "pnpm --filter cashapps-remote preview",
-    "preview:host": "pnpm --filter crm-host preview",
-    "start": "pnpm run build && pnpm run preview",
-    "generate:types": "node scripts/generate-remote-types.js"
+    "dev": "turbo run dev",
+    "dev:remote": "turbo run dev --filter=cashapps-remote",
+    "dev:host": "turbo run dev --filter=crm-host",
+    "dev:vanilla": "turbo run dev --filter=vanilla-widgets",
+    "build": "turbo run build",
+    "build:remote": "turbo run build --filter=cashapps-remote",
+    "build:host": "turbo run build --filter=crm-host",
+    "build:vanilla": "turbo run build --filter=vanilla-widgets",
+    "preview": "turbo run preview",
+    "preview:remote": "turbo run preview --filter=cashapps-remote",
+    "preview:host": "turbo run preview --filter=crm-host",
+    "start": "turbo run build && turbo run preview",
+    "generate:types": "node scripts/generate-remote-types.js",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
@@ -30,7 +34,9 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.0",
+    "turbo": "^2.3.3",
     "typescript": "^5.3.3",
     "vite": "^5.0.0"
-  }
+  },
+  "packageManager": "pnpm@8.15.0"
 }

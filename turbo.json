@@ -1,0 +1,30 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "vite.config.ts", "tsconfig.json", "federation.config.json"],
+      "outputs": ["dist/**"],
+      "cache": true
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false
+    },
+    "preview": {
+      "dependsOn": ["build"],
+      "persistent": true,
+      "cache": false
+    },
+    "lint": {
+      "dependsOn": [],
+      "cache": true
+    },
+    "typecheck": {
+      "dependsOn": [],
+      "cache": true
+    }
+  }
+}

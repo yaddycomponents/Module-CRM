@@ -26,8 +26,9 @@ A Module Federation demo showcasing micro-frontend architecture with React, Antd
 
 ## Packages
 
-- **crm-host**: Main CRM application (host)
-- **cashapps-remote**: Cash Application module (remote)
+- **crm-host**: Main CRM application (host) - Port 3000
+- **cashapps-remote**: Cash Application module (remote) - Port 5001
+- **vanilla-widgets**: Framework-agnostic Web Components (remote) - Port 5002
 - **growcomponents-module**: Shared component library
 
 ## Getting Started
@@ -36,13 +37,60 @@ A Module Federation demo showcasing micro-frontend architecture with React, Antd
 # Install dependencies
 pnpm install
 
-# Build and run
+# Build and run all packages (with Turborepo caching)
 pnpm dev
+
+# Run specific package
+pnpm dev:host     # CRM Host only
+pnpm dev:remote   # CashApps Remote only
+pnpm dev:vanilla  # Vanilla Widgets only
+
+# Build all packages
+pnpm build
 
 # Access
 # Host: http://localhost:3000
 # Remote: http://localhost:5001
+# Vanilla: http://localhost:5002
 ```
+
+## Turborepo
+
+This project uses **Turborepo** for build orchestration:
+
+```bash
+# All commands use turbo under the hood
+pnpm build          # Builds all packages (cached)
+pnpm dev            # Runs dev servers for all packages
+pnpm build --force  # Force rebuild (skip cache)
+```
+
+### How Turborepo Helps
+
+| Without Turborepo | With Turborepo |
+|-------------------|----------------|
+| Rebuilds everything every time | Skips unchanged packages |
+| Sequential builds | Parallel builds where possible |
+| ~30s full build | ~2s cached build |
+| Manual dependency ordering | Automatic task pipelines |
+
+### Task Pipeline (turbo.json)
+
+```
+build → depends on ^build (dependencies first)
+       ↓
+dev   → depends on ^build (remotes must build first)
+       ↓
+preview → depends on build
+```
+
+### Cache
+
+Turborepo caches build outputs in `.turbo/`. Inputs that invalidate cache:
+- `src/**` - Source files
+- `vite.config.ts` - Build config
+- `tsconfig.json` - TypeScript config
+- `federation.config.json` - Module Federation config
 
 ## Key Features
 
