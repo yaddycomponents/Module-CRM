@@ -9,7 +9,7 @@ import {
   BellOutlined,
   SearchOutlined,
 } from '@ant-design/icons'
-import { theme } from 'growcomponents-module'
+import { ThemeProvider, useTheme } from './context/ThemeContext'
 import Breadcrumb from './components/Breadcrumb'
 import DevTools from './components/DevTools'
 import AppRoutes, { menuItems } from './routes'
@@ -24,9 +24,10 @@ const iconMap: Record<string, React.ReactNode> = {
   SettingOutlined: <SettingOutlined />,
 }
 
-function App() {
+function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { theme } = useTheme()
 
   const selectedKey = location.pathname.startsWith('/cashapps') ? '/cashapps' : location.pathname
 
@@ -142,6 +143,14 @@ function App() {
         <DevTools />
       </Layout>
     </ConfigProvider>
+  )
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   )
 }
 

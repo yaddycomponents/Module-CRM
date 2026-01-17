@@ -8,7 +8,7 @@ import {
   MoreOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons'
-import { CrmButton, CrmTable, StatCard } from 'growcomponents-module'
+import { CrmButton, CrmTable, StatCard } from '@yaddycomponents/growcomponents-module'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Text, Link } = Typography

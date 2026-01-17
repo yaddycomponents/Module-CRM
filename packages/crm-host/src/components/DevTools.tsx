@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Badge, Button, Card, ColorPicker, Divider, Drawer, Space, Tabs, Tag, Typography } from 'antd'
 import { CheckCircleOutlined, LinkOutlined, ToolOutlined } from '@ant-design/icons'
 import type { Color } from 'antd/es/color-picker'
+import { useTheme } from '../context/ThemeContext'
 
 const { Text, Title } = Typography
 
@@ -15,12 +16,7 @@ interface FederatedModule {
 export default function DevTools() {
   const [open, setOpen] = useState(false)
   const [modules, setModules] = useState<FederatedModule[]>([])
-  const [themeColors, setThemeColors] = useState({
-    primary: '#6366f1',
-    success: '#10b981',
-    warning: '#f59e0b',
-    error: '#ef4444',
-  })
+  const { colors: themeColors, setColors } = useTheme()
 
   useEffect(() => {
     async function checkModules() {
@@ -176,10 +172,10 @@ export default function DevTools() {
                           <ColorPicker
                             value={value}
                             onChange={(color: Color) => {
-                              setThemeColors((prev) => ({
-                                ...prev,
+                              setColors({
+                                ...themeColors,
                                 [key]: color.toHexString(),
-                              }))
+                              })
                             }}
                           />
                           <Text code>{value}</Text>
@@ -193,7 +189,7 @@ export default function DevTools() {
                   <Title level={5}>How Theme Sharing Works</Title>
                   <Card size="small" style={{ background: '#f8fafc' }}>
                     <pre style={{ margin: 0, fontSize: 11, overflow: 'auto' }}>
-{`// growcomponents-module/src/theme.ts
+{`// @yaddycomponents/growcomponents-module/src/theme.ts
 export const theme = {
   token: {
     colorPrimary: '${themeColors.primary}',
@@ -204,7 +200,7 @@ export const theme = {
 }
 
 // Both Host and Remote import same theme:
-import { theme } from 'growcomponents-module'`}
+import { theme } from '@yaddycomponents/growcomponents-module'`}
                     </pre>
                   </Card>
 
@@ -230,15 +226,15 @@ import { theme } from 'growcomponents-module'`}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Text>StatCard</Text>
-                      <Tag color="green">Shared (growcomponents-module)</Tag>
+                      <Tag color="green">Shared (@yaddycomponents/growcomponents-module)</Tag>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Text>CrmButton</Text>
-                      <Tag color="green">Shared (growcomponents-module)</Tag>
+                      <Tag color="green">Shared (@yaddycomponents/growcomponents-module)</Tag>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Text>CrmTable</Text>
-                      <Tag color="green">Shared (growcomponents-module)</Tag>
+                      <Tag color="green">Shared (@yaddycomponents/growcomponents-module)</Tag>
                     </div>
                   </Space>
                 </div>
@@ -278,7 +274,7 @@ import { theme } from 'growcomponents-module'`}
               │ workspace:*
               ↓
 ┌─────────────────────────────────┐
-│       growcomponents-module             │
+│       @yaddycomponents/growcomponents-module             │
 │  theme, CrmButton, StatCard...  │
 └─────────────────────────────────┘`}
                     </pre>

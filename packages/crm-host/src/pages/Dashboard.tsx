@@ -1,5 +1,5 @@
 import { Tabs, Select, Row, Col } from 'antd'
-import { StatCard } from 'growcomponents-module'
+import { StatCard } from '@yaddycomponents/growcomponents-module'
 
 const filters = {
   businessUnits: ['All', 'Unit A', 'Unit B'],

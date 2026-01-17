@@ -1,5 +1,5 @@
 import { ConfigProvider, Layout, Typography } from 'antd'
-import { theme } from 'growcomponents-module'
+import { theme } from '@yaddycomponents/growcomponents-module'
 import PaymentList from './components/PaymentList'
 
 const { Header, Content } = Layout
