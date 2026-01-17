@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Tabs, Tag, Space, Tooltip, Dropdown, Typography } from 'antd'
+import { Tabs, Tag, Space, Tooltip, Dropdown, Typography, Modal, Form, Select, InputNumber, message } from 'antd'
 import {
   DownloadOutlined,
   PlusOutlined,
@@ -7,6 +7,7 @@ import {
   EyeInvisibleOutlined,
   MoreOutlined,
   InfoCircleOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import { CrmButton, CrmTable, StatCard } from '@yaddycomponents/growcomponents-module'
 import type { ColumnsType } from 'antd/es/table'
@@ -69,90 +70,124 @@ const mockPayments: Payment[] = [
   },
 ]
 
+const mockInvoices = [
+  { id: 'INV-001', customer: 'Bell Inc', amount: 500, dueDate: '15 Jul 2025' },
+  { id: 'INV-002', customer: 'Bell Inc', amount: 440, dueDate: '20 Jul 2025' },
+  { id: 'INV-003', customer: 'Acme Corp', amount: 1200, dueDate: '25 Jul 2025' },
+]
+
 const formatCurrency = (value: number) => {
   return `$ ${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}`
 }
 
-const columns: ColumnsType<Payment> = [
-  {
-    title: 'Payment #',
-    dataIndex: 'paymentNumber',
-    key: 'paymentNumber',
-    sorter: true,
-    render: (text) => <Link>{text}</Link>,
-  },
-  {
-    title: 'Customer',
-    dataIndex: 'customer',
-    key: 'customer',
-    sorter: true,
-    render: (text, record) => (
-      <Space>
-        {record.customerStatus === 'unknown' ? (
-          <Text type="danger">{text || 'Unknown'}</Text>
-        ) : (
-          <Link>{text}</Link>
-        )}
-        {record.customer && <Tooltip title="Info"><InfoCircleOutlined /></Tooltip>}
-      </Space>
-    ),
-  },
-  {
-    title: 'Payment Date',
-    dataIndex: 'paymentDate',
-    key: 'paymentDate',
-    sorter: true,
-  },
-  {
-    title: 'Payment Description',
-    dataIndex: 'description',
-    key: 'description',
-  },
-  {
-    title: 'Applied Amount',
-    dataIndex: 'appliedAmount',
-    key: 'appliedAmount',
-    align: 'right',
-    render: (value) => formatCurrency(value),
-  },
-  {
-    title: 'Unapplied Amount',
-    dataIndex: 'unappliedAmount',
-    key: 'unappliedAmount',
-    align: 'right',
-    sorter: true,
-    render: (value) => formatCurrency(value),
-  },
-  {
-    title: 'Reference #',
-    dataIndex: 'referenceNumber',
-    key: 'referenceNumber',
-  },
-  {
-    title: 'Payment Mode',
-    dataIndex: 'paymentMode',
-    key: 'paymentMode',
-    sorter: true,
-  },
-  {
-    title: 'Payment Source',
-    dataIndex: 'paymentSource',
-    key: 'paymentSource',
-    render: (text) => <Tag>{text}</Tag>,
-  },
-  {
-    title: '',
-    key: 'actions',
-    render: () => (
-      <Dropdown menu={{ items: [{ key: '1', label: 'View Details' }, { key: '2', label: 'Apply Payment' }] }}>
-        <MoreOutlined style={{ cursor: 'pointer' }} />
-      </Dropdown>
-    ),
-  },
-]
-
 export default function PaymentList() {
   const [activeTab, setActiveTab] = useState('unapplied')
+  const [quickApplyOpen, setQuickApplyOpen] = useState(false)
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
+  const [form] = Form.useForm()
+
+  const handleQuickApply = (payment: Payment) => {
+    setSelectedPayment(payment)
+    setQuickApplyOpen(true)
+    form.setFieldsValue({ amount: payment.unappliedAmount })
+  }
+
+  const handleApplySubmit = () => {
+    form.validateFields().then((values) => {
+      message.success(`Applied ${formatCurrency(values.amount)} to ${values.invoice}`)
+      setQuickApplyOpen(false)
+      form.resetFields()
+    })
+  }
+
+  const columns: ColumnsType<Payment> = [
+    {
+      title: 'Payment #',
+      dataIndex: 'paymentNumber',
+      key: 'paymentNumber',
+      sorter: true,
+      render: (text) => <Link>{text}</Link>,
+    },
+    {
+      title: 'Customer',
+      dataIndex: 'customer',
+      key: 'customer',
+      sorter: true,
+      render: (text, record) => (
+        <Space>
+          {record.customerStatus === 'unknown' ? (
+            <Text type="danger">{text || 'Unknown'}</Text>
+          ) : (
+            <Link>{text}</Link>
+          )}
+          {record.customer && <Tooltip title="Info"><InfoCircleOutlined /></Tooltip>}
+        </Space>
+      ),
+    },
+    {
+      title: 'Payment Date',
+      dataIndex: 'paymentDate',
+      key: 'paymentDate',
+      sorter: true,
+    },
+    {
+      title: 'Payment Description',
+      dataIndex: 'description',
+      key: 'description',
+    },
+    {
+      title: 'Applied Amount',
+      dataIndex: 'appliedAmount',
+      key: 'appliedAmount',
+      align: 'right',
+      render: (value) => formatCurrency(value),
+    },
+    {
+      title: 'Unapplied Amount',
+      dataIndex: 'unappliedAmount',
+      key: 'unappliedAmount',
+      align: 'right',
+      sorter: true,
+      render: (value) => <Text style={{ color: value > 0 ? '#ef4444' : '#10b981' }}>{formatCurrency(value)}</Text>,
+    },
+    {
+      title: 'Reference #',
+      dataIndex: 'referenceNumber',
+      key: 'referenceNumber',
+    },
+    {
+      title: 'Payment Mode',
+      dataIndex: 'paymentMode',
+      key: 'paymentMode',
+      sorter: true,
+    },
+    {
+      title: 'Payment Source',
+      dataIndex: 'paymentSource',
+      key: 'paymentSource',
+      render: (text) => <Tag>{text}</Tag>,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          <Tooltip title="Quick Apply">
+            <CrmButton
+              type="primary"
+              size="small"
+              icon={<ThunderboltOutlined />}
+              onClick={() => handleQuickApply(record)}
+              disabled={record.unappliedAmount === 0}
+            />
+          </Tooltip>
+          <Dropdown menu={{ items: [{ key: '1', label: 'View Details' }, { key: '2', label: 'Full Apply' }] }}>
+            <MoreOutlined style={{ cursor: 'pointer' }} />
+          </Dropdown>
+        </Space>
+      ),
+    },
+  ]
 
   const stats = {
     totalUnapplied: 66839,
@@ -223,6 +258,55 @@ export default function PaymentList() {
           showTotal: (total, range) => `${range[0]} - ${range[1]} of ${total}`,
         }}
       />
+
+      <Modal
+        title={
+          <Space>
+            <ThunderboltOutlined style={{ color: '#6366f1' }} />
+            <span>Quick Apply Payment</span>
+          </Space>
+        }
+        open={quickApplyOpen}
+        onCancel={() => setQuickApplyOpen(false)}
+        onOk={handleApplySubmit}
+        okText="Apply Payment"
+      >
+        {selectedPayment && (
+          <div style={{ marginBottom: 16, padding: 12, background: '#f8fafc', borderRadius: 8 }}>
+            <Text type="secondary">Payment #{selectedPayment.paymentNumber}</Text>
+            <br />
+            <Text strong style={{ fontSize: 18 }}>{formatCurrency(selectedPayment.unappliedAmount)}</Text>
+            <Text type="secondary"> available to apply</Text>
+          </div>
+        )}
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="invoice"
+            label="Select Invoice"
+            rules={[{ required: true, message: 'Please select an invoice' }]}
+          >
+            <Select
+              placeholder="Choose invoice to apply payment"
+              options={mockInvoices.map((inv) => ({
+                value: inv.id,
+                label: `${inv.id} - ${inv.customer} - ${formatCurrency(inv.amount)}`,
+              }))}
+            />
+          </Form.Item>
+          <Form.Item
+            name="amount"
+            label="Amount to Apply"
+            rules={[{ required: true, message: 'Please enter amount' }]}
+          >
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value!.replace(/\$\s?|(,*)/g, '') as unknown as number}
+              max={selectedPayment?.unappliedAmount}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   )
 }
