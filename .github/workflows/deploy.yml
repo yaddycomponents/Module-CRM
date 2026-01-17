@@ -5,6 +5,25 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'What to deploy'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - remote-only
+          - host-only
+      environment:
+        description: 'Environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +55,9 @@ jobs:
     name: Deploy CashApps Remote
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.remote == 'true'
+    if: |
+      (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'remote-only')) ||
+      (github.event_name != 'workflow_dispatch' && needs.changes.outputs.remote == 'true')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,7 +91,12 @@ jobs:
         working-directory: packages/cashapps-remote
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
-        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+        run: |
+          if [ "${{ inputs.environment }}" = "preview" ]; then
+            vercel deploy --prebuilt --token=$VERCEL_TOKEN
+          else
+            vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+          fi
 
   deploy-host:
     name: Deploy CRM Host
@@ -78,8 +104,11 @@ jobs:
     needs: [changes, deploy-remote]
     if: |
       always() &&
-      needs.changes.outputs.host == 'true' &&
-      (needs.deploy-remote.result == 'success' || needs.deploy-remote.result == 'skipped')
+      (needs.deploy-remote.result == 'success' || needs.deploy-remote.result == 'skipped') &&
+      (
+        (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'host-only')) ||
+        (github.event_name != 'workflow_dispatch' && needs.changes.outputs.host == 'true')
+      )
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -114,4 +143,9 @@ jobs:
         working-directory: packages/crm-host
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
-        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+        run: |
+          if [ "${{ inputs.environment }}" = "preview" ]; then
+            vercel deploy --prebuilt --token=$VERCEL_TOKEN
+          else
+            vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+          fi
