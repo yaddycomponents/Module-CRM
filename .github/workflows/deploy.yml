@@ -8,14 +8,13 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
 jobs:
-  # Deploy Remote first - Host depends on it
   deploy-remote:
     name: Deploy CashApps Remote
     runs-on: ubuntu-latest
-    outputs:
-      preview-url: ${{ steps.deploy.outputs.preview-url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,6 +30,9 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
       - name: Install dependencies
         working-directory: packages/cashapps-remote
         run: pnpm install
@@ -40,16 +42,12 @@ jobs:
         run: pnpm build
 
       - name: Deploy to Vercel
-        id: deploy
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
-          working-directory: packages/cashapps-remote/dist
-          vercel-args: '${{ github.event_name == ''push'' && github.ref == ''refs/heads/main'' && ''--prod'' || '''' }}'
+        working-directory: packages/cashapps-remote
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
+        run: |
+          vercel deploy ./dist --token=$VERCEL_TOKEN --prod --yes
 
-  # Deploy Host after Remote is ready
   deploy-host:
     name: Deploy CRM Host
     runs-on: ubuntu-latest
@@ -69,21 +67,22 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
       - name: Install dependencies
         working-directory: packages/crm-host
         run: pnpm install
 
-      - name: Build with Remote URL
+      - name: Build
         working-directory: packages/crm-host
         env:
           VITE_REMOTE_URL: ${{ secrets.VITE_REMOTE_URL }}
         run: pnpm build
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
-          working-directory: packages/crm-host/dist
-          vercel-args: '${{ github.event_name == ''push'' && github.ref == ''refs/heads/main'' && ''--prod'' || '''' }}'
+        working-directory: packages/crm-host
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
+        run: |
+          vercel deploy ./dist --token=$VERCEL_TOKEN --prod --yes
