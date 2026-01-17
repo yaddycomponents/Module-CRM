@@ -9,15 +9,16 @@
     "preview": "vite preview --port 5000"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.0",
     "@ant-design/icons": "^5.2.6",
+    "@yaddycomponents/growcomponents-module": "^1.0.0",
     "antd": "^5.12.0",
     "dayjs": "^1.11.10",
-    "@yaddycomponents/growcomponents-module": "^1.0.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.0"
   },
   "devDependencies": {
+    "@module-federation/typescript": "^3.1.6",
     "@originjs/vite-plugin-federation": "^1.3.5",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

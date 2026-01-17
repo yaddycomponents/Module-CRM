@@ -2,6 +2,7 @@
   "name": "crm",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "pnpm run build && pnpm run preview",
     "dev:remote": "pnpm --filter cashapps-remote dev",
@@ -12,6 +13,7 @@
     "preview": "pnpm -r --parallel preview",
     "preview:remote": "pnpm --filter cashapps-remote preview",
     "preview:host": "pnpm --filter crm-host preview",
-    "start": "pnpm run build && pnpm run preview"
+    "start": "pnpm run build && pnpm run preview",
+    "generate:types": "node scripts/generate-remote-types.js"
   }
 }

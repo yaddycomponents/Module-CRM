@@ -1,0 +1,8 @@
+{
+  "name": "cashappsRemote",
+  "exposes": {
+    "./PaymentList": "./components/PaymentList/index.tsx",
+    "./PaymentDetails": "./components/PaymentDetails/index.tsx",
+    "./routes": "./routes.ts"
+  }
+}
