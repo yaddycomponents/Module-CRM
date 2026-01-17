@@ -49,7 +49,8 @@ export const cashappsBreadcrumbs = [
 export function getBreadcrumbsForPath(path: string) {
   const breadcrumbs = [...cashappsBreadcrumbs]
 
-  const paymentDetailMatch = path.match(/\/cashapps\/payment\/(\d+)/)
+  // Match /cashapps/payment/465862 (numeric or alphanumeric payment IDs)
+  const paymentDetailMatch = path.match(/\/cashapps\/payment\/([^/]+)/)
   if (paymentDetailMatch) {
     breadcrumbs.push({
       path: '/cashapps',
