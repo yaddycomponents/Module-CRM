@@ -1,0 +1,17 @@
+{
+  "name": "crm",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run build && pnpm run preview",
+    "dev:remote": "pnpm --filter cashapps-remote dev",
+    "dev:host": "pnpm --filter crm-host dev",
+    "build": "pnpm --filter cashapps-remote build && pnpm --filter crm-host build",
+    "build:remote": "pnpm --filter cashapps-remote build",
+    "build:host": "pnpm --filter crm-host build",
+    "preview": "pnpm -r --parallel preview",
+    "preview:remote": "pnpm --filter cashapps-remote preview",
+    "preview:host": "pnpm --filter crm-host preview",
+    "start": "pnpm run build && pnpm run preview"
+  }
+}
