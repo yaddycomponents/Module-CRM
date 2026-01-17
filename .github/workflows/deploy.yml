@@ -26,15 +26,12 @@ on:
           - preview
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  # Turborepo Remote Cache
   TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
-  # Check which packages changed
   changes:
     name: Detect Changes
     runs-on: ubuntu-latest
@@ -57,14 +54,15 @@ jobs:
             vanilla:
               - 'packages/vanilla-widgets/**'
 
-  # Build all packages with Turborepo (uses remote cache)
-  build:
-    name: Build with Turborepo
+  deploy-remote:
+    name: Deploy CashApps Remote
     runs-on: ubuntu-latest
     needs: changes
+    if: |
+      (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'remote-only')) ||
+      (github.event_name != 'workflow_dispatch' && needs.changes.outputs.remote == 'true')
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -75,37 +73,6 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build with Turborepo Remote Cache
-        run: pnpm build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            packages/*/dist
-          retention-days: 1
-
-  deploy-remote:
-    name: Deploy CashApps Remote
-    runs-on: ubuntu-latest
-    needs: [changes, build]
-    if: |
-      (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'remote-only')) ||
-      (github.event_name != 'workflow_dispatch' && needs.changes.outputs.remote == 'true')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: packages
-
       - name: Install Vercel CLI
         run: npm install -g vercel
 
@@ -115,7 +82,13 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Deploy to Vercel
+      - name: Build
+        working-directory: packages/cashapps-remote
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
+        run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy
         working-directory: packages/cashapps-remote
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
@@ -129,19 +102,21 @@ jobs:
   deploy-vanilla:
     name: Deploy Vanilla Widgets
     runs-on: ubuntu-latest
-    needs: [changes, build]
+    needs: changes
     if: |
       (github.event_name == 'workflow_dispatch' && inputs.deploy_target == 'both') ||
       (github.event_name != 'workflow_dispatch' && needs.changes.outputs.vanilla == 'true')
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: build-artifacts
-          path: packages
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -152,7 +127,13 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Deploy to Vercel
+      - name: Build
+        working-directory: packages/vanilla-widgets
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
+        run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy
         working-directory: packages/vanilla-widgets
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
@@ -166,7 +147,7 @@ jobs:
   deploy-host:
     name: Deploy CRM Host
     runs-on: ubuntu-latest
-    needs: [changes, build, deploy-remote, deploy-vanilla]
+    needs: [changes, deploy-remote, deploy-vanilla]
     if: |
       always() &&
       (needs.deploy-remote.result == 'success' || needs.deploy-remote.result == 'skipped') &&
@@ -176,14 +157,16 @@ jobs:
         (github.event_name != 'workflow_dispatch' && needs.changes.outputs.host == 'true')
       )
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: build-artifacts
-          path: packages
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -194,11 +177,17 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Deploy to Vercel
+      - name: Build
         working-directory: packages/crm-host
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
           VITE_REMOTE_URL: ${{ secrets.VITE_REMOTE_URL }}
+        run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy
+        working-directory: packages/crm-host
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
         run: |
           if [ "${{ inputs.environment }}" = "preview" ]; then
             vercel deploy --prebuilt --token=$VERCEL_TOKEN
