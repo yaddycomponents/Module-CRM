@@ -29,6 +29,9 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  # Turborepo Remote Cache
+  TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
   # Check which packages changed
@@ -38,6 +41,7 @@ jobs:
     outputs:
       remote: ${{ steps.filter.outputs.remote }}
       host: ${{ steps.filter.outputs.host }}
+      vanilla: ${{ steps.filter.outputs.vanilla }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -50,14 +54,14 @@ jobs:
             host:
               - 'packages/crm-host/**'
               - 'packages/growcomponents/**'
+            vanilla:
+              - 'packages/vanilla-widgets/**'
 
-  deploy-remote:
-    name: Deploy CashApps Remote
+  # Build all packages with Turborepo (uses remote cache)
+  build:
+    name: Build with Turborepo
     runs-on: ubuntu-latest
     needs: changes
-    if: |
-      (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'remote-only')) ||
-      (github.event_name != 'workflow_dispatch' && needs.changes.outputs.remote == 'true')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,6 +75,38 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build with Turborepo Remote Cache
+        run: pnpm build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            packages/*/dist
+          retention-days: 1
+
+  deploy-remote:
+    name: Deploy CashApps Remote
+    runs-on: ubuntu-latest
+    needs: [changes, build]
+    if: |
+      (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'remote-only')) ||
+      (github.event_name != 'workflow_dispatch' && needs.changes.outputs.remote == 'true')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: packages
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -80,12 +116,6 @@ jobs:
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-
-      - name: Build with Vercel
-        working-directory: packages/cashapps-remote
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
-        run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
         working-directory: packages/cashapps-remote
@@ -98,13 +128,51 @@ jobs:
             vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
           fi
 
+  deploy-vanilla:
+    name: Deploy Vanilla Widgets
+    runs-on: ubuntu-latest
+    needs: [changes, build]
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_target == 'both') ||
+      (github.event_name != 'workflow_dispatch' && needs.changes.outputs.vanilla == 'true')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: packages
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Pull Vercel Config
+        working-directory: packages/vanilla-widgets
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Deploy to Vercel
+        working-directory: packages/vanilla-widgets
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
+        run: |
+          if [ "${{ inputs.environment }}" = "preview" ]; then
+            vercel deploy --prebuilt --token=$VERCEL_TOKEN
+          else
+            vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+          fi
+
   deploy-host:
     name: Deploy CRM Host
     runs-on: ubuntu-latest
-    needs: [changes, deploy-remote]
+    needs: [changes, build, deploy-remote, deploy-vanilla]
     if: |
       always() &&
       (needs.deploy-remote.result == 'success' || needs.deploy-remote.result == 'skipped') &&
+      (needs.deploy-vanilla.result == 'success' || needs.deploy-vanilla.result == 'skipped') &&
       (
         (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'host-only')) ||
         (github.event_name != 'workflow_dispatch' && needs.changes.outputs.host == 'true')
@@ -113,15 +181,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+          name: build-artifacts
+          path: packages
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -132,17 +196,11 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Build with Vercel
-        working-directory: packages/crm-host
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
-          VITE_REMOTE_URL: ${{ secrets.VITE_REMOTE_URL }}
-        run: vercel build --prod --token=$VERCEL_TOKEN
-
       - name: Deploy to Vercel
         working-directory: packages/crm-host
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
+          VITE_REMOTE_URL: ${{ secrets.VITE_REMOTE_URL }}
         run: |
           if [ "${{ inputs.environment }}" = "preview" ]; then
             vercel deploy --prebuilt --token=$VERCEL_TOKEN

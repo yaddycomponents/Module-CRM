@@ -84,13 +84,53 @@ dev   → depends on ^build (remotes must build first)
 preview → depends on build
 ```
 
-### Cache
+### Local Cache
 
 Turborepo caches build outputs in `.turbo/`. Inputs that invalidate cache:
 - `src/**` - Source files
 - `vite.config.ts` - Build config
 - `tsconfig.json` - TypeScript config
 - `federation.config.json` - Module Federation config
+
+### Remote Cache (Vercel)
+
+Share build cache across CI and team members:
+
+**1. Local Setup (one-time)**
+```bash
+# Login to Vercel
+npx turbo login
+
+# Link project to Vercel
+npx turbo link
+```
+
+**2. CI Setup (GitHub Actions)**
+
+Add these to your repository:
+
+| Type | Name | Value |
+|------|------|-------|
+| Secret | `VERCEL_TOKEN` | Your Vercel token |
+| Variable | `TURBO_TEAM` | Your Vercel team slug (or username) |
+
+The workflow automatically uses `VERCEL_TOKEN` as `TURBO_TOKEN`.
+
+**Benefits:**
+```
+First CI run:     5 min (builds everything, uploads to cache)
+Second CI run:    30 sec (downloads from cache)
+Local after CI:   instant (reuses CI cache)
+```
+
+**How it works:**
+```
+Developer A builds → uploads to Vercel Cache
+                              ↓
+CI runs        → downloads from cache (skip build)
+                              ↓
+Developer B   → downloads from cache (instant)
+```
 
 ## Key Features
 
