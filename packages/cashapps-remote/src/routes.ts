@@ -22,10 +22,10 @@ export const cashappsRoutes: CashAppsRoute[] = [
     component: 'PaymentList',
   },
   {
-    path: '/payments/:id',
+    path: '/payment/:paymentId',
     title: 'Payment Details',
     breadcrumb: 'Payment Details',
-    component: 'PaymentDetail',
+    component: 'PaymentDetails',
   },
   {
     path: '/remittance',
@@ -48,6 +48,19 @@ export const cashappsBreadcrumbs = [
 
 export function getBreadcrumbsForPath(path: string) {
   const breadcrumbs = [...cashappsBreadcrumbs]
+
+  const paymentDetailMatch = path.match(/\/cashapps\/payment\/(\d+)/)
+  if (paymentDetailMatch) {
+    breadcrumbs.push({
+      path: '/cashapps',
+      title: 'All Payments',
+    })
+    breadcrumbs.push({
+      path: path,
+      title: `Payment #${paymentDetailMatch[1]}`,
+    })
+    return breadcrumbs
+  }
 
   const route = cashappsRoutes.find(
     (r) => `${CASHAPPS_BASE_PATH}${r.path}` === path ||

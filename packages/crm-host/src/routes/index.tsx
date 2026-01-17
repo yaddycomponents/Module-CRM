@@ -4,10 +4,11 @@ import { Spin, Tabs } from 'antd'
 import Dashboard from '../pages/Dashboard'
 
 const RemotePaymentList = lazy(() => import('cashappsRemote/PaymentList'))
+const RemotePaymentDetails = lazy(() => import('cashappsRemote/PaymentDetails'))
 
 const defaultNavItems = [{ key: '/cashapps', label: 'All Payments' }]
 
-function CashAppsPage() {
+function CashAppsListPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [navItems, setNavItems] = useState(defaultNavItems)
@@ -50,6 +51,10 @@ function CashAppsPage() {
   )
 }
 
+function CashAppsDetailPage() {
+  return <RemotePaymentDetails />
+}
+
 export default function AppRoutes() {
   return (
     <Suspense
@@ -61,7 +66,8 @@ export default function AppRoutes() {
     >
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/cashapps/*" element={<CashAppsPage />} />
+        <Route path="/cashapps" element={<CashAppsListPage />} />
+        <Route path="/cashapps/payment/:paymentId" element={<CashAppsDetailPage />} />
         <Route path="/customers" element={<div>Customers Page</div>} />
         <Route path="/invoices" element={<div>Invoices Page</div>} />
         <Route path="/settings" element={<div>Settings Page</div>} />

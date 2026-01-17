@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Tabs, Tag, Space, Tooltip, Dropdown, Typography, Modal, Form, Select, InputNumber, message } from 'antd'
 import {
   DownloadOutlined,
@@ -81,6 +82,7 @@ const formatCurrency = (value: number) => {
 }
 
 export default function PaymentList() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('unapplied')
   const [quickApplyOpen, setQuickApplyOpen] = useState(false)
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
@@ -106,7 +108,9 @@ export default function PaymentList() {
       dataIndex: 'paymentNumber',
       key: 'paymentNumber',
       sorter: true,
-      render: (text) => <Link>{text}</Link>,
+      render: (text) => (
+        <Link onClick={() => navigate(`/cashapps/payment/${text}`)}>{text}</Link>
+      ),
     },
     {
       title: 'Customer',

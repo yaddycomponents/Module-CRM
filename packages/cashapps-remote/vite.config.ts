@@ -20,6 +20,7 @@ export default defineConfig({
       filename: 'remoteEntry.js',
       exposes: {
         './PaymentList': './src/components/PaymentList/index.tsx',
+        './PaymentDetails': './src/components/PaymentDetails/index.tsx',
         './routes': './src/routes.ts',
       },
       shared: {

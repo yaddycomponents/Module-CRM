@@ -3,6 +3,11 @@ declare module 'cashappsRemote/PaymentList' {
   export default PaymentList
 }
 
+declare module 'cashappsRemote/PaymentDetails' {
+  const PaymentDetails: React.ComponentType
+  export default PaymentDetails
+}
+
 declare module 'cashappsRemote/routes' {
   export interface CashAppsRoute {
     path: string
