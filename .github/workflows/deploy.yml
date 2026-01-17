@@ -19,34 +19,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Install dependencies
+      - name: Pull Vercel Config
         working-directory: packages/cashapps-remote
-        run: pnpm install
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Build
+      - name: Build with Vercel
         working-directory: packages/cashapps-remote
-        run: pnpm build
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
+        run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
         working-directory: packages/cashapps-remote
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
-        run: |
-          vercel deploy ./dist --token=$VERCEL_TOKEN --prod --yes
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
 
   deploy-host:
     name: Deploy CRM Host
@@ -56,33 +53,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Install dependencies
-        working-directory: packages/crm-host
-        run: pnpm install
-
-      - name: Build
+      - name: Pull Vercel Config
         working-directory: packages/crm-host
         env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Build with Vercel
+        working-directory: packages/crm-host
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
           VITE_REMOTE_URL: ${{ secrets.VITE_REMOTE_URL }}
-        run: pnpm build
+        run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
         working-directory: packages/crm-host
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
-        run: |
-          vercel deploy ./dist --token=$VERCEL_TOKEN --prod --yes
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
