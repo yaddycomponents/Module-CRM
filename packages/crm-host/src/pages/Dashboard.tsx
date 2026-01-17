@@ -1,5 +1,8 @@
-import { Tabs, Select, Row, Col } from 'antd'
+import { useEffect, useRef } from 'react'
+import { Tabs, Select, Row, Col, Typography, message } from 'antd'
 import { StatCard } from '@yaddycomponents/growcomponents-module'
+
+const { Title } = Typography
 
 const filters = {
   businessUnits: ['All', 'Unit A', 'Unit B'],
@@ -8,6 +11,27 @@ const filters = {
 }
 
 export default function Dashboard() {
+  const vanillaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    async function loadVanillaWidgets() {
+      try {
+        const mod = await import('vanillaWidgets/registerAll')
+        const widgets = mod.default || mod
+        widgets.registerAll()
+
+        vanillaRef.current?.querySelectorAll('stats-widget').forEach((widget) => {
+          widget.addEventListener('stats-click', ((e: CustomEvent) => {
+            message.info(`Clicked: ${e.detail.title} - Value: ${e.detail.value}`)
+          }) as EventListener)
+        })
+      } catch (error) {
+        console.log('Vanilla widgets not available:', error)
+      }
+    }
+    loadVanillaWidgets()
+  }, [])
+
   return (
     <div>
       <Tabs
@@ -25,6 +49,19 @@ export default function Dashboard() {
         <Select defaultValue="All" style={{ width: 120 }} options={filters.regions.map(v => ({ value: v, label: `Regions: ${v}` }))} />
         <Select defaultValue="All" style={{ width: 120 }} options={filters.subsidiary.map(v => ({ value: v, label: `Subsidiary: ${v}` }))} />
       </div>
+
+      <Title level={5} style={{ marginBottom: 16 }}>Vanilla Web Components (Framework-Agnostic)</Title>
+      <div
+        ref={vanillaRef}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}
+      >
+        <stats-widget title="Total Revenue" value="$125,430" subtitle="↑ 12% from last month" color="#10b981" icon="money" />
+        <stats-widget title="Active Users" value="2,847" subtitle="↑ 8% this week" color="#6366f1" icon="users" />
+        <stats-widget title="Conversion Rate" value="3.24%" subtitle="↑ 0.5% improvement" color="#f59e0b" icon="trending" />
+        <stats-widget title="Page Views" value="48,291" subtitle="Last 30 days" color="#ef4444" icon="chart" />
+      </div>
+
+      <Title level={5} style={{ marginBottom: 16 }}>React Components (StatCard)</Title>
 
       <Row gutter={[16, 16]}>
         <Col span={8}>

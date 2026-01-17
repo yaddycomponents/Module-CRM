@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vanilla Widgets - Standalone Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+      margin: 0;
+    }
+    h1 { color: #1e293b; margin-bottom: 8px; }
+    p { color: #64748b; margin-bottom: 32px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+    }
+    #log {
+      margin-top: 32px;
+      padding: 16px;
+      background: #1e293b;
+      border-radius: 8px;
+      color: #10b981;
+      font-family: monospace;
+      font-size: 14px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vanilla Web Components</h1>
+  <p>These components work in ANY framework - React, Vue, Solid, or plain HTML!</p>
+
+  <div class="grid">
+    <stats-widget
+      title="Total Revenue"
+      value="$125,430"
+      subtitle="↑ 12% from last month"
+      color="#10b981"
+      icon="money">
+    </stats-widget>
+
+    <stats-widget
+      title="Active Users"
+      value="2,847"
+      subtitle="↑ 8% this week"
+      color="#6366f1"
+      icon="users">
+    </stats-widget>
+
+    <stats-widget
+      title="Conversion Rate"
+      value="3.24%"
+      subtitle="↑ 0.5% improvement"
+      color="#f59e0b"
+      icon="trending">
+    </stats-widget>
+
+    <stats-widget
+      title="Page Views"
+      value="48,291"
+      subtitle="Last 30 days"
+      color="#ef4444"
+      icon="chart">
+    </stats-widget>
+  </div>
+
+  <div id="log">Click events will appear here...</div>
+
+  <script type="module">
+    import './src/index.js'
+
+    document.querySelectorAll('stats-widget').forEach(widget => {
+      widget.addEventListener('stats-click', (e) => {
+        const log = document.getElementById('log')
+        const time = new Date().toLocaleTimeString()
+        log.innerHTML = `[${time}] Clicked: ${e.detail.title} (${e.detail.value}) - Click #${e.detail.clickCount}\n` + log.innerHTML
+      })
+    })
+  </script>
+</body>
+</html>

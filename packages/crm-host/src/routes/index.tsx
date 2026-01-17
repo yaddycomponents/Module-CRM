@@ -17,9 +17,10 @@ function CashAppsListPage() {
   useEffect(() => {
     async function loadNavItems() {
       try {
-        const { cashappsNavItems } = await import('cashappsRemote/routes')
-        if (Array.isArray(cashappsNavItems) && cashappsNavItems.length > 0) {
-          setNavItems(cashappsNavItems)
+        const routesModule = await import('cashappsRemote/routes')
+        const routes = routesModule.default || routesModule
+        if (Array.isArray(routes.cashappsNavItems) && routes.cashappsNavItems.length > 0) {
+          setNavItems(routes.cashappsNavItems)
         }
       } catch (error) {
         console.log('Could not load cashapps nav items:', error)

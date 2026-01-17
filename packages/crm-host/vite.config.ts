@@ -6,14 +6,15 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   const remoteUrl = env.VITE_REMOTE_URL || 'http://localhost:5001/assets/remoteEntry.js'
+  const vanillaUrl = env.VITE_VANILLA_URL || 'http://localhost:5002/assets/remoteEntry.js'
 
   return {
     server: {
-      port: 5000,
+      port: 3000,
       strictPort: true,
     },
     preview: {
-      port: 5000,
+      port: 3000,
       strictPort: true,
     },
     plugins: [
@@ -22,6 +23,7 @@ export default defineConfig(({ mode }) => {
         name: 'crmHost',
         remotes: {
           cashappsRemote: remoteUrl,
+          vanillaWidgets: vanillaUrl,
         },
       shared: {
         react: {

@@ -6,7 +6,7 @@ A Module Federation demo showcasing micro-frontend architecture with React, Antd
 
 ```
 ┌─────────────────────────────────────────┐
-│         CRM Host (:5000)                │
+│         CRM Host (:3000)                │
 │  ┌─────────────────────────────────────┐│
 │  │  Dashboard, Customers, Settings     ││
 │  │  CashApps (Remote) ←────────────────┼┤
@@ -40,7 +40,7 @@ pnpm install
 pnpm dev
 
 # Access
-# Host: http://localhost:5000
+# Host: http://localhost:3000
 # Remote: http://localhost:5001
 ```
 
@@ -75,6 +75,25 @@ See [AWS Deployment Guide](./docs/AWS_DEPLOYMENT.md) for detailed instructions:
 - CloudFront distribution with SPA routing
 - Cache strategy for remoteEntry.js
 - GitHub Actions workflow for AWS
+
+## Dependency Management
+
+Shared dependencies are in **root `package.json`** (not in individual packages):
+
+```
+root/package.json         → react, antd, vite (shared)
+packages/crm-host/        → scripts only, no deps
+packages/cashapps-remote/ → scripts only, no deps
+```
+
+**Why?**
+- Single source of truth for versions
+- Prevents version drift between host and remote
+- Critical for Module Federation singleton sharing
+
+**Note for deployment:**
+- **Vercel**: Auto-detects `pnpm-workspace.yaml` and installs from root automatically
+- **AWS/Docker**: Must run `pnpm install` at root before building packages
 
 ## Important Notes
 

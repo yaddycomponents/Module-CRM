@@ -32,9 +32,19 @@ export default function Breadcrumb() {
     async function loadBreadcrumbs() {
       if (location.pathname.startsWith('/cashapps')) {
         try {
-          const { getBreadcrumbsForPath } = await import('cashappsRemote/routes')
-          setBreadcrumbs(getBreadcrumbsForPath(location.pathname))
-        } catch {
+          const routesModule = await import('cashappsRemote/routes')
+          const routes = routesModule.default || routesModule
+          const result = routes.getBreadcrumbsForPath(location.pathname)
+          if (result && result.length > 0) {
+            setBreadcrumbs(result)
+          } else {
+            setBreadcrumbs([
+              { path: '/', title: 'Home' },
+              { path: '/cashapps', title: 'Cash Application' },
+            ])
+          }
+        } catch (error) {
+          console.error('Failed to load breadcrumbs from remote:', error)
           setBreadcrumbs([
             { path: '/', title: 'Home' },
             { path: '/cashapps', title: 'Cash Application' },
