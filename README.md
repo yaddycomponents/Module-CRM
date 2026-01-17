@@ -50,3 +50,34 @@ pnpm dev
 - Shared theme and components
 - IKEA pattern for route sharing
 - DevTools panel for debugging federation
+- Independent deployment (remote updates without host redeploy)
+
+## Deployment
+
+### Vercel (Recommended for quick setup)
+
+Pre-configured with `.github/workflows/deploy.yml`:
+- Automatic deployment on push to main
+- Path-based filtering (only deploys changed packages)
+- Manual trigger with environment selection
+
+### AWS
+
+See [AWS Deployment Guide](./docs/AWS_DEPLOYMENT.md) for detailed instructions:
+
+**Option 1: AWS Amplify** (Easy setup)
+- Vercel-like experience with automatic CI/CD
+- Connect repo and deploy in minutes
+- Built-in preview deployments
+
+**Option 2: S3 + CloudFront** (Full control)
+- S3 bucket setup with CORS for Module Federation
+- CloudFront distribution with SPA routing
+- Cache strategy for remoteEntry.js
+- GitHub Actions workflow for AWS
+
+## Important Notes
+
+- **Build mode required**: vite-plugin-federation only generates `remoteEntry.js` during build
+- **CORS critical**: Remote must allow requests from host origin
+- **Cache remoteEntry.js carefully**: Short TTL for quick updates
