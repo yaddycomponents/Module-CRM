@@ -31,17 +31,15 @@ export function StatCard({
   title,
   value,
   subtitle,
-  color = '#6366f1',
 }: {
   title: string
   value: string | number
   subtitle?: string
-  color?: string
 }) {
   return (
-    <CrmCard cardStyle="stat" style={{ borderLeftColor: color }}>
+    <CrmCard cardStyle="stat">
       <div style={{ fontSize: '14px', color: '#64748b' }}>{title}</div>
-      <div style={{ fontSize: '28px', fontWeight: 600, color }}>{value}</div>
+      <div style={{ fontSize: '28px', fontWeight: 600, color: '#6366f1' }}>{value}</div>
       {subtitle && <div style={{ fontSize: '12px', color: '#94a3b8' }}>{subtitle}</div>}
     </CrmCard>
   )

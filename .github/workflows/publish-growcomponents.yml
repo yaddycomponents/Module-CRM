@@ -1,0 +1,61 @@
+name: Publish Growcomponents
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/growcomponents/**'
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type (if auto-bump desired)'
+        required: false
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - patch
+          - minor
+          - major
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@yaddycomponents'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Version bump (if requested)
+        if: ${{ github.event.inputs.version_bump != 'none' && github.event.inputs.version_bump != '' }}
+        working-directory: packages/growcomponents
+        run: npm version ${{ github.event.inputs.version_bump }} --no-git-tag-version
+
+      - name: Build package
+        working-directory: packages/growcomponents
+        run: pnpm run build
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/growcomponents
+        run: pnpm publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
