@@ -26,6 +26,8 @@ jobs:
   publish:
     name: Build and Publish
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -55,5 +57,3 @@ jobs:
       - name: Publish to GitHub Packages
         working-directory: packages/growcomponents
         run: pnpm publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
