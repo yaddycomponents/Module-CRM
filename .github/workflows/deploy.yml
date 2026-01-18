@@ -105,15 +105,7 @@ jobs:
       (github.event_name != 'workflow_dispatch' && needs.changes.outputs.vanilla == 'true')
     env:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID_VANILLA }}
     steps:
-      - name: Debug secrets
-        run: |
-          echo "VERCEL_PROJECT_ID length: ${#VERCEL_PROJECT_ID}"
-          echo "VERCEL_ORG_ID length: ${#VERCEL_ORG_ID}"
-          if [ -z "$VERCEL_PROJECT_ID" ]; then echo "ERROR: VERCEL_PROJECT_ID is empty!"; fi
-          if [ -z "$VERCEL_ORG_ID" ]; then echo "ERROR: VERCEL_ORG_ID is empty!"; fi
-
       - uses: actions/checkout@v4
 
       - name: Setup pnpm
