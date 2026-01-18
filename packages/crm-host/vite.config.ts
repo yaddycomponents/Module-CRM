@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
 
   const remoteUrl = env.VITE_REMOTE_URL || 'http://localhost:5001/mf-manifest.json'
   const vanillaUrl = env.VITE_VANILLA_URL || 'http://localhost:5002/mf-manifest.json'
+  const isProduction = mode === 'production'
 
   return {
     server: {
@@ -18,7 +19,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       strictPort: true,
     },
-    base: 'http://localhost:3000',
+    base: isProduction ? '/' : 'http://localhost:3000',
     plugins: [
       react(),
       federation({
