@@ -1,23 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import federation from '@originjs/vite-plugin-federation'
+import { federation } from '@module-federation/vite'
 
 export default defineConfig({
   server: {
     port: 5001,
     strictPort: true,
     cors: true,
+    origin: 'http://localhost:5001',
   },
   preview: {
     port: 5001,
     strictPort: true,
     cors: true,
   },
+  base: 'http://localhost:5001',
   plugins: [
     react(),
     federation({
       name: 'cashappsRemote',
       filename: 'remoteEntry.js',
+      manifest: true,
       exposes: {
         './PaymentList': './src/components/PaymentList/index.tsx',
         './PaymentDetails': './src/components/PaymentDetails/index.tsx',

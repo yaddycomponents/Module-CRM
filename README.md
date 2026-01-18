@@ -134,11 +134,24 @@ Developer B   → downloads from cache (instant)
 
 ## Key Features
 
-- Runtime Module Federation with Vite
+- Runtime Module Federation with Vite (`@module-federation/vite`)
 - Shared theme and components
 - IKEA pattern for route sharing
-- DevTools panel for debugging federation
+- Chrome DevTools support via `mf-manifest.json`
+- Built-in DevTools panel (press `D` in app)
 - Independent deployment (remote updates without host redeploy)
+
+## Chrome DevTools
+
+Install the [Module Federation DevTools](https://chromewebstore.google.com/detail/module-federation-devtool/dmaopmepmohgjgkhkpljcadpjdlkejed) Chrome extension.
+
+1. Open app in browser
+2. Press `F12` → Module Federation tab
+3. Features:
+   - Dependency visualization
+   - Shared dependency analysis
+   - Module proxy for local development
+   - Multi-tab isolation
 
 ## Deployment
 
