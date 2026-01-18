@@ -1,6 +1,6 @@
 {
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm build:remote && cd packages/cashapps-remote",
+  "buildCommand": "cd ../.. && pnpm build:remote --force && cd packages/cashapps-remote",
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [

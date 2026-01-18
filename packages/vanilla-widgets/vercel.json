@@ -1,6 +1,6 @@
 {
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm build:vanilla && cd packages/vanilla-widgets",
+  "buildCommand": "cd ../.. && pnpm build:vanilla --force && cd packages/vanilla-widgets",
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [
