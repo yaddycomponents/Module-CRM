@@ -29,3 +29,7 @@ pnpm-debug.log*
 .cache
 .turbo
 *.tsbuildinfo
+
+# Module Federation temp files
+.__mf__temp/
+**/.__mf__temp/
