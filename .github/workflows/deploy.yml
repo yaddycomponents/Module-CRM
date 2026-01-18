@@ -62,6 +62,8 @@ jobs:
     if: |
       (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'remote-only')) ||
       (github.event_name != 'workflow_dispatch' && needs.changes.outputs.remote == 'true')
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
     steps:
       - uses: actions/checkout@v4
 
@@ -79,20 +81,14 @@ jobs:
 
       - name: Pull Vercel Config
         working-directory: packages/cashapps-remote
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build
         working-directory: packages/cashapps-remote
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
         run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy
         working-directory: packages/cashapps-remote
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_REMOTE }}
         run: |
           if [ "${{ inputs.environment }}" = "preview" ]; then
             vercel deploy --prebuilt --token=$VERCEL_TOKEN
@@ -107,6 +103,8 @@ jobs:
     if: |
       (github.event_name == 'workflow_dispatch' && inputs.deploy_target == 'both') ||
       (github.event_name != 'workflow_dispatch' && needs.changes.outputs.vanilla == 'true')
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
     steps:
       - uses: actions/checkout@v4
 
@@ -124,20 +122,14 @@ jobs:
 
       - name: Pull Vercel Config
         working-directory: packages/vanilla-widgets
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build
         working-directory: packages/vanilla-widgets
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
         run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy
         working-directory: packages/vanilla-widgets
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_VANILLA }}
         run: |
           if [ "${{ inputs.environment }}" = "preview" ]; then
             vercel deploy --prebuilt --token=$VERCEL_TOKEN
@@ -157,6 +149,8 @@ jobs:
         (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'both' || inputs.deploy_target == 'host-only')) ||
         (github.event_name != 'workflow_dispatch' && needs.changes.outputs.host == 'true')
       )
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
     steps:
       - uses: actions/checkout@v4
 
@@ -174,22 +168,17 @@ jobs:
 
       - name: Pull Vercel Config
         working-directory: packages/crm-host
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build
         working-directory: packages/crm-host
         env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
           VITE_REMOTE_URL: ${{ secrets.VITE_REMOTE_URL }}
           VITE_VANILLA_URL: ${{ secrets.VITE_VANILLA_URL }}
         run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Deploy
         working-directory: packages/crm-host
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_HOST }}
         run: |
           if [ "${{ inputs.environment }}" = "preview" ]; then
             vercel deploy --prebuilt --token=$VERCEL_TOKEN
