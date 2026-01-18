@@ -52,14 +52,14 @@ importers:
   packages/cashapps-remote:
     dependencies:
       '@yaddycomponents/growcomponents-module':
-        specifier: workspace:*
-        version: link:../growcomponents
+        specifier: ^1.0.0
+        version: 1.0.0(antd@5.29.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   packages/crm-host:
     dependencies:
       '@yaddycomponents/growcomponents-module':
-        specifier: workspace:*
-        version: link:../growcomponents
+        specifier: ^1.0.0
+        version: 1.0.0(antd@5.29.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   packages/growcomponents:
     dependencies:
@@ -683,6 +683,13 @@ packages:
 
   '@vue/shared@3.5.26':
     resolution: {integrity: sha512-7Z6/y3uFI5PRoKeorTOSXKcDj0MSasfNNltcslbFrPpcw6aXRUALq4IfJlaTRspiWIUOEZbrpM+iQGmCOiWe4A==}
+
+  '@yaddycomponents/growcomponents-module@1.0.0':
+    resolution: {integrity: sha512-WxBM0FBK86f/Yopo6jthtueopIYokYtWwlKOtAsMvnpFW7nbAiKQ3ED11Abgv+B5KmmtvITgP9t2VmG3cEDaVg==, tarball: https://npm.pkg.github.com/download/@yaddycomponents/growcomponents-module/1.0.0/d0be02638daa2960fb566eb6ca07f6683e653908}
+    peerDependencies:
+      antd: ^5.12.0
+      react: ^18.2.0
+      react-dom: ^18.2.0
 
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
@@ -1967,6 +1974,12 @@ snapshots:
       typescript: 5.9.3
 
   '@vue/shared@3.5.26': {}
+
+  '@yaddycomponents/growcomponents-module@1.0.0(antd@5.29.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      antd: 5.29.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   ajv@6.12.6:
     dependencies:

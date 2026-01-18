@@ -1,6 +1,5 @@
 {
-  "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm --filter cashapps-remote run build",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [

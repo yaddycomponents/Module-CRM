@@ -1,6 +1,5 @@
 {
-  "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm --filter crm-host run build",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [

@@ -9,6 +9,6 @@
     "preview": "vite preview --port 5001"
   },
   "dependencies": {
-    "@yaddycomponents/growcomponents-module": "workspace:*"
+    "@yaddycomponents/growcomponents-module": "^1.0.0"
   }
 }
