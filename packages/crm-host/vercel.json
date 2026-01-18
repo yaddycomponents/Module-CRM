@@ -1,7 +1,8 @@
 {
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm build:host",
+  "buildCommand": "cd ../.. && pnpm build:host && cd packages/crm-host",
   "outputDirectory": "dist",
+  "framework": null,
   "rewrites": [
     { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ]

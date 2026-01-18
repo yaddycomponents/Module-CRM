@@ -1,7 +1,8 @@
 {
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm build:vanilla",
+  "buildCommand": "cd ../.. && pnpm build:vanilla && cd packages/vanilla-widgets",
   "outputDirectory": "dist",
+  "framework": null,
   "rewrites": [
     { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ],
