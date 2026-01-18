@@ -69,7 +69,6 @@ export default function Dashboard() {
             title="Total Balance"
             value="$ 3,19,20,444"
             subtitle="898 invoices • 26,942 customers"
-            color="#6366f1"
           />
         </Col>
         <Col span={8}>
@@ -77,7 +76,6 @@ export default function Dashboard() {
             title="Receivables Outstanding"
             value="$ 5,01,91,74,531"
             subtitle="3,543 invoices"
-            color="#6366f1"
           />
         </Col>
         <Col span={8}>
@@ -85,7 +83,6 @@ export default function Dashboard() {
             title="Total Collections"
             value="$ 0"
             subtitle="0 invoices • 0 customers"
-            color="#10b981"
           />
         </Col>
         <Col span={8}>
@@ -93,7 +90,6 @@ export default function Dashboard() {
             title="Current Due"
             value="$ 0"
             subtitle="0 invoices"
-            color="#f59e0b"
           />
         </Col>
         <Col span={8}>
@@ -101,14 +97,12 @@ export default function Dashboard() {
             title="Total Outstanding"
             value="$ 5,01,91,74,531"
             subtitle="3,543 invoices"
-            color="#6366f1"
           />
         </Col>
         <Col span={8}>
           <StatCard
             title="Current DSO"
             value="45 days"
-            color="#3b82f6"
           />
         </Col>
         <Col span={8}>
@@ -116,7 +110,6 @@ export default function Dashboard() {
             title="Over Due"
             value="$ 3,19,20,444"
             subtitle="26,942 invoices"
-            color="#ef4444"
           />
         </Col>
         <Col span={8}>
@@ -124,7 +117,6 @@ export default function Dashboard() {
             title="Unapplied Payments"
             value="$ 61,35,965"
             subtitle="291 payments"
-            color="#10b981"
           />
         </Col>
         <Col span={8}>
@@ -132,7 +124,6 @@ export default function Dashboard() {
             title="Unapplied Credits"
             value="$ 2,03,436"
             subtitle="142 credits"
-            color="#10b981"
           />
         </Col>
       </Row>
