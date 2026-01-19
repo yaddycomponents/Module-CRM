@@ -24,6 +24,8 @@ export default defineConfig(({ mode }) => {
       react(),
       federation({
         name: 'crmHost',
+        filename: 'remoteEntry.js',
+        manifest: true,
         remotes: {
           cashappsRemote: {
             type: 'module',
