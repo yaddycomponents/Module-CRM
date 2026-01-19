@@ -27,6 +27,9 @@ export default defineConfig(({ mode }) => {
         name: 'cashappsRemote',
         filename: 'remoteEntry.js',
         manifest: true,
+        getPublicPath: isProduction
+          ? `return "${prodBaseUrl}/"`
+          : `return "${devBaseUrl}/"`,
         exposes: {
           './PaymentList': './src/components/PaymentList/index.tsx',
           './PaymentDetails': './src/components/PaymentDetails/index.tsx',

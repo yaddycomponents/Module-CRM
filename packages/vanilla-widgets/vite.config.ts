@@ -25,6 +25,9 @@ export default defineConfig(({ mode }) => {
         name: 'vanillaWidgets',
         filename: 'remoteEntry.js',
         manifest: true,
+        getPublicPath: isProduction
+          ? `return "${prodBaseUrl}/"`
+          : `return "${devBaseUrl}/"`,
         exposes: {
           './StatsWidget': './src/StatsWidget.js',
           './registerAll': './src/index.js',
