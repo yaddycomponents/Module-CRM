@@ -4,21 +4,22 @@ import { federation } from '@module-federation/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const isProduction = mode === 'production'
-  const baseUrl = env.VITE_BASE_URL || 'http://localhost:5002'
+  const devBaseUrl = 'http://localhost:5002'
+  const prodBaseUrl = env.VITE_BASE_URL || 'https://vanilla-widgets-liart.vercel.app'
 
   return {
     server: {
       port: 5002,
       strictPort: true,
       cors: true,
-      origin: 'http://localhost:5002',
+      origin: devBaseUrl,
     },
     preview: {
       port: 5002,
       strictPort: true,
       cors: true,
     },
-    base: isProduction ? '/' : baseUrl,
+    base: isProduction ? `${prodBaseUrl}/` : `${devBaseUrl}/`,
     plugins: [
       federation({
         name: 'vanillaWidgets',

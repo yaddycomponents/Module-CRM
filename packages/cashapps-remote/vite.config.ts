@@ -5,21 +5,22 @@ import { federation } from '@module-federation/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const isProduction = mode === 'production'
-  const baseUrl = env.VITE_BASE_URL || 'http://localhost:5001'
+  const devBaseUrl = 'http://localhost:5001'
+  const prodBaseUrl = env.VITE_BASE_URL || 'https://cashapps-remote.vercel.app'
 
   return {
     server: {
       port: 5001,
       strictPort: true,
       cors: true,
-      origin: 'http://localhost:5001',
+      origin: devBaseUrl,
     },
     preview: {
       port: 5001,
       strictPort: true,
       cors: true,
     },
-    base: isProduction ? '/' : baseUrl,
+    base: isProduction ? `${prodBaseUrl}/` : `${devBaseUrl}/`,
     plugins: [
       react(),
       federation({
